@@ -6,8 +6,17 @@ def fibonacci(n):
         raise ValueError("Fibonacci is not defined for negative integers")
 
     # TODO: Add the base case. Note: Fib(0) is 0; Fib(1) is 1; Fib(2) is 1, so on.
-
+    # Base Case
+    if n == 1:
+        return 0
+    if n == 2:
+        return 1
+    
     # TODO: Return fibonacci: 
+    minus_one = fibonacci(n - 1)
+    minus_two = fibonacci(n - 2)
+    return minus_one + minus_two
+
     raise NotImplementedError("Complete fibonacci")
 
 
