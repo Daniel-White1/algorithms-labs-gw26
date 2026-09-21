@@ -66,25 +66,25 @@ def bubble_sort(arr):
 > 
 > | Pass | Scanning Range | Comparison ($arr[j]$ vs $arr[j+1]$) | Action | Array State | Sorted Suffix |
 > |---|---|---|---|---|---|
-> | **1 (Example)** | $j=0 \dots 4$ | $5 > 2$ | SWAP | `[2, 5, 9, 1, 5, 6]` | |
+> | **1 (Example)** | $j=0 \dots 4$ | $5 > 2$ | SWAP | `[2, 5, 9, 1, 5, ]` | |
 > | | | $5 \le 9$ | KEEP | `[2, 5, 9, 1, 5, 6]` | |
 > | | | $9 > 1$ | SWAP | `[2, 5, 1, 9, 5, 6]` | |
 > | | | $9 > 5$ | SWAP | `[2, 5, 1, 5, 9, 6]` | |
 > | | | $9 > 6$ | SWAP | `[2, 5, 1, 5, 6, 9]` | `[9]` |
-> | **2 (TODO)** | $j=0 \dots 3$ | $arr[0]$ vs $arr[1]$: | | | |
-> | | | $arr[1]$ vs $arr[2]$: | | | |
-> | | | $arr[2]$ vs $arr[3]$: | | | |
-> | | | $arr[3]$ vs $arr[4]$: | | `[                      ]` | `[       ]` |
-> | **3 (TODO)** | $j=0 \dots 2$ | $arr[0]$ vs $arr[1]$: | | | |
-> | | | $arr[1]$ vs $arr[2]$: | | | |
-> | | | $arr[2]$ vs $arr[3]$: | | `[                      ]` | `[          ]` |
-> | **4 (TODO)** | $j=0 \dots 1$ | $arr[0]$ vs $arr[1]$: | | | |
-> | | | $arr[1]$ vs $arr[2]$: | | `[                      ]` | `[             ]` |
-> | **Exit** | Did any swaps occur in Pass 4? Explain early stopping: | | | `[                      ]` | **Sorted!** |
+> | **2 (TODO)** | $j=0 \dots 3$ | $arr[0]$ vs $arr[1]$: $2 < 5$ | KEEP |`[2, 5, 1, 5, 6, 9]`| |
+> | | | $arr[1]$ vs $arr[2]$: $5 > 1$| SWAP  |`[2, 1, 5, 5, 6, 9]`| |
+> | | | $arr[2]$ vs $arr[3]$: $5 = 5$|KEEP|`[2,1,5,5,6,9]`||
+> | | | $arr[3]$ vs $arr[4]$: $ 6 > 5$| SWAP | `[2,1,5,5,6,9]` | `[6,9]` |
+> | **3 (TODO)** | $j=0 \dots 2$ | $arr[0]$ vs $arr[1]$: $2 > 1$| SWAP |`[1,2,5,5,6,9]` | |
+> | | | $arr[1]$ vs $arr[2]$: $2 < 5 |KEEP | | |
+> | | | $arr[2]$ vs $arr[3]$: 5=5|KEEP | `[1,2,5,5,6,9]` | `[5,6,9]` |
+> | **4 (TODO)** | $j=0 \dots 1$ | $arr[0]$ vs $arr[1]$: 1 < 2 | | | |
+> | | | $arr[1]$ vs $arr[2]$: 2 < 5| | `[1,2,5,5,6,9]` | `[1,2,5,6,9]` |
+> | **Exit** | Did any swaps occur in Pass 4? Explain early stopping: Because there were no swaps we know the array is already sorted| | | `[1,2,5,5,6,9]` | **Sorted!** |
 > 
 > ```text
-> Total Comparisons performed: 
-> Total Swaps performed: 
+> Total Comparisons performed: 14
+> Total Swaps performed: 3
 > ```
 > *(Tip: You can verify your trace by running `python sorting_trace.py`)*
 
@@ -121,8 +121,8 @@ def insertion_sort(arr):
 > |---|---|---|---|---|---|
 > | **Init** | - | - | Prefix of length 1 is sorted | `[7, 3, 5, 8, 2]` | `[7]` |
 > | **$i=1$ (Example)** | `3` | $7 > 3 \to$ shift $7$ right | Place `3` at index 0 | `[3, 7, 5, 8, 2]` | `[3, 7]` |
-> | **$i=2$ (TODO)** | `5` | | | `[               ]` | `[         ]` |
-> | **$i=3$ (TODO)** | `8` | | | `[               ]` | `[            ]` |
+> | **$i=2$ (TODO)** | `5` | $7 > 5 \to$ shift $7$ right |Place `5` at index 1| `[3, 5, 7, 8, 2]` | `[3,5,7]` |
+> | **$i=3$ (TODO)** | `8` |$7 < 8$ keep 7| place | `[               ]` | `[            ]` |
 > | **$i=4$ (TODO)** | `2` | | | `[               ]` | `[               ]` |
 > 
 > ```text
@@ -316,12 +316,12 @@ python benchmark_partition.py
 > ```text
 > TODO 3.1:
 > Record your execution times for N = 1,000,000 random integers (or N = 100,000 with --quick):
-> - Python Timsort:
-> - Lomuto (Random Pivot):
-> - Lomuto (Median-of-3):
-> - Lomuto (Last Element):
-> - Hoare (Two-Pointer):
-> - 3-Way Quicksort:
+| Python Timsort (Built-in) | 0.510 s | 1.0x |
+| Lomuto QS (Random Pivot) | 5.425 s | 10.6x |
+| Lomuto QS (Median-of-3) | 4.543 s | 8.9x |
+| Lomuto QS (Last Element) | 5.458 s | 10.7x |
+| Hoare QS (Two-Pointer) | 5.192 s | 10.2x |
+| 3-Way Quicksort (Dutch Flag) | 9.424 s | 18.5x |
 > 
 > TODO 3.2A:
 > In the edge case benchmarks:
