@@ -1,4 +1,4 @@
-"""INSTRUCTOR SOLUTION. Part 3: implement merge. Recursive Merge Sort is provided."""
+"""Part 3: implement merge. Recursive Merge Sort is provided."""
 
 
 def merge(left, right):
@@ -7,23 +7,8 @@ def merge(left, right):
   Preserve duplicates. On equal values, take from left first.
   Use indices; do not remove items from the input lists.
   """
-  result = []
-  i = 0
-  j = 0
-  while i < len(left) and j < len(right):
-    if left[i] <= right[j]:
-      result.append(left[i])
-      i += 1
-    else:
-      result.append(right[j])
-      j += 1
-  while i < len(left):
-    result.append(left[i])
-    i += 1
-  while j < len(right):
-    result.append(right[j])
-    j += 1
-  return result
+  # TODO 3.2: Compare current elements, then copy any remaining elements.
+  raise NotImplementedError("Complete merge")
 
 
 def merge_sort(arr):
@@ -37,5 +22,5 @@ def merge_sort(arr):
 
 
 if __name__ == "__main__":
-  from lab_checks import check_mergesort
+  from lab2.morning_session.lab2.lab_checks import check_mergesort
   raise SystemExit(check_mergesort(merge, merge_sort))
