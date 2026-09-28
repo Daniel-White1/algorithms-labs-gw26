@@ -1,6 +1,5 @@
-"""Provided checks for Lab 3. No third-party packages required."""
+"""Provided checks for Lab 4. No third-party packages required."""
 
-from collections import Counter
 import random
 import sys
 
@@ -104,90 +103,7 @@ def verify_bst_invariants(tree):
   check_node(tree.root, float("-inf"), float("inf"))
 
 
-def verify_avl_invariants(tree):
-  """Verify BST ordering, parent pointers, stored heights, and AVL balance."""
-  verify_bst_invariants(tree)
-
-  def check_node(node):
-    if node is None:
-      return -1
-
-    left_height = check_node(node.left)
-    right_height = check_node(node.right)
-    expected_height = 1 + max(left_height, right_height)
-
-    require(
-      node.height == expected_height,
-      "Incorrect stored height at key " + str(node.key)
-      + ": expected " + str(expected_height)
-      + ", found " + str(node.height)
-    )
-    require(
-      abs(left_height - right_height) <= 1,
-      "AVL balance invariant violated at key " + str(node.key)
-    )
-    return expected_height
-
-  check_node(tree.root)
-
-
 # Test suites
-def check_heap(max_heapify_down, build_max_heap, heap_sort):
-  def heapify_case(values, i, heap_size):
-    arr = values.copy()
-    result = max_heapify_down(arr, i, heap_size)
-
-    require(result is None, "max_heapify_down must return None")
-    require(Counter(arr) == Counter(values), "max_heapify_down lost or changed values")
-    require(arr[heap_size:] == values[heap_size:], "Changed elements outside active heap")
-
-    for j in range(heap_size):
-      left = 2 * j + 1
-      right = 2 * j + 2
-      if left < heap_size:
-        require(
-          arr[j] >= arr[left],
-          "Max-heap invariant violated at index " + str(j)
-          + " (parent " + str(arr[j]) + " < left child " + str(arr[left]) + ")"
-        )
-      if right < heap_size:
-        require(
-          arr[j] >= arr[right],
-          "Max-heap invariant violated at index " + str(j)
-          + " (parent " + str(arr[j]) + " < right child " + str(arr[right]) + ")"
-        )
-
-  def sort_case(values):
-    arr = values.copy()
-    result = heap_sort(arr)
-
-    require(result is arr, "heap_sort must return the original list object")
-    require(arr == sorted(values), "Array not sorted in ascending order")
-    require(Counter(arr) == Counter(values), "heap_sort lost or changed values")
-
-  cases = [
-    ("Empty heap sift-down", lambda: heapify_case([], 0, 0)),
-    ("Single-element sift-down", lambda: heapify_case([10], 0, 1)),
-    ("Sift-down left child larger", lambda: heapify_case([4, 10, 2], 0, 3)),
-    ("Sift-down right child larger", lambda: heapify_case([4, 2, 10], 0, 3)),
-    ("Multi-level sift-down on trace input [4, 10, 8, 5, 1, 2, 7]",
-     lambda: heapify_case([4, 10, 8, 5, 1, 2, 7], 0, 7)),
-    ("Sift-down preserving suffix outside heap_size",
-     lambda: heapify_case([3, 12, 9, 2, 1, 99, 100], 0, 5)),
-    ("Ascending Heapsort on empty list", lambda: sort_case([])),
-    ("Ascending Heapsort on single element", lambda: sort_case([42])),
-    ("Ascending Heapsort on two elements", lambda: sort_case([9, 3])),
-    ("Ascending Heapsort on sorted input", lambda: sort_case([1, 2, 3, 4, 5])),
-    ("Ascending Heapsort on reverse sorted input", lambda: sort_case([5, 4, 3, 2, 1])),
-    ("Ascending Heapsort on duplicates", lambda: sort_case([7, 7, 7, 7])),
-    ("Ascending Heapsort on negative values", lambda: sort_case([3, -1, 3, 0, -8, 2])),
-    ("Ascending Heapsort on trace input [15, 12, 8, 6, 2, 3, 7]",
-     lambda: sort_case([15, 12, 8, 6, 2, 3, 7])),
-  ]
-
-  return run_checks(cases)
-
-
 def check_bst(bst_insert, bst_delete):
   def test_insert_empty():
     tree = BinarySearchTree()
@@ -283,13 +199,8 @@ def check_bst(bst_insert, bst_delete):
 
 
 def check_rotations(
-  balance_factor,
-  rotate_left,
-  rotate_right,
-  rotate_left_right,
-  rotate_right_left,
-  avl_insert_iterative,
-  avl_insert_recursive
+  balance_factor, rotate_left, rotate_right, rotate_left_right, rotate_right_left,
+  avl_insert_iterative, avl_insert_recursive
 ):
   def test_balance_factor_values():
     node = Node(20)
@@ -422,47 +333,68 @@ def check_rotations(
     require(n20.right is n30 and n30.parent is n20, "30 is right child of 20")
     require(inorder_walk(tree.root) == [10, 20, 30], "In-order traversal preserved")
 
-  def insertion_case(insert, keys, expected_root):
-    tree = BinarySearchTree()
-    inserted_keys = []
+  def verify_avl(tree):
+    verify_bst_invariants(tree)
 
-    for key in keys:
-      inserted = insert(tree, key)
-      inserted_keys.append(key)
-
-      require(inserted is not None, "Insertion must return the new Node")
-      require(inserted.key == key, "Returned Node must contain the inserted key")
-
-      current = tree.root
-      while current is not None and current.key != key:
-        current = current.left if key < current.key else current.right
-      require(current is inserted, "Returned Node must be linked into the tree")
-
-      verify_avl_invariants(tree)
+    def check_node(node):
+      if node is None:
+        return -1
+      left_height = check_node(node.left)
+      right_height = check_node(node.right)
+      expected = 1 + max(left_height, right_height)
       require(
-        inorder_walk(tree.root) == sorted(inserted_keys),
-        "In-order traversal must contain every inserted key in sorted order"
+        node.height == expected,
+        "Stored height of " + str(node.key) + " is " + str(node.height)
+        + ", expected " + str(expected)
       )
+      require(
+        abs(left_height - right_height) <= 1,
+        "AVL balance violated at key " + str(node.key)
+      )
+      return expected
 
-    require(
-      tree.root.key == expected_root,
-      "Expected root " + str(expected_root) + ", found " + str(tree.root.key)
-    )
+    check_node(tree.root)
 
-  def test_insert_rotation_cases(insert):
-    insertion_case(insert, [42], 42)
-    insertion_case(insert, [30, 20, 10], 20)  # LL
-    insertion_case(insert, [10, 20, 30], 20)  # RR
-    insertion_case(insert, [30, 10, 20], 20)  # LR
-    insertion_case(insert, [10, 30, 20], 20)  # RL
+  def make_insert_signature_test(avl_insert, keys):
+    def test():
+      tree = BinarySearchTree()
+      for k in keys:
+        inserted = avl_insert(tree, k)
+        require(inserted is not None and inserted.key == k, "Return the inserted Node")
+      verify_avl(tree)
+      require(tree.root.key == 20, "Root must be 20 after inserting " + str(keys))
+      require(inorder_walk(tree.root) == [10, 20, 30], "In-order traversal must be [10, 20, 30]")
+    return test
 
-  def test_insert_larger_tree(insert):
-    insertion_case(
-      insert,
-      [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,
-       5, 15, 27, 90, 100],
-      50
-    )
+  def make_insert_many_test(avl_insert):
+    def test():
+      tree = BinarySearchTree()
+      keys = list(range(1, 128))
+      for k in keys:
+        avl_insert(tree, k)
+        verify_avl(tree)
+      require(inorder_walk(tree.root) == keys, "In-order traversal must equal sorted keys")
+      require(tree.root.height == 6, "127 sorted inserts must produce height 6")
+
+      tree = BinarySearchTree()
+      shuffled = list(range(500))
+      random.Random(3212).shuffle(shuffled)
+      for k in shuffled:
+        avl_insert(tree, k)
+      verify_avl(tree)
+      require(inorder_walk(tree.root) == sorted(shuffled), "In-order traversal must equal sorted keys")
+    return test
+
+  def make_insert_duplicate_test(avl_insert):
+    def test():
+      tree = BinarySearchTree()
+      for k in [20, 10, 30]:
+        avl_insert(tree, k)
+      existing = tree.root.left
+      returned = avl_insert(tree, 10)
+      require(returned is existing, "Duplicate insert must return the existing Node")
+      require(inorder_walk(tree.root) == [10, 20, 30], "Duplicate insert must not change the tree")
+    return test
 
   def demo_degeneration_profiling():
     # Demonstration comparing search depth on degenerate vs balanced BST
@@ -530,9 +462,9 @@ def check_rotations(
     bal_depth = search_depth(bal_tree.root, target)
 
     print(
-      "\n  [Demo] Search depth for key " + str(target) + " across " + str(n) + " keys:"
-      + "\n         Degenerate (sorted input): " + str(deg_depth) + " comparisons (O(n))"
-      + "\n         Balanced (median input):   " + str(bal_depth) + " comparisons (O(log n))"
+      "\n  [Demo] Search comparisons for key " + str(target) + " across " + str(n) + " keys:"
+      + "\n         Degenerate (sorted input): " + str(deg_depth + 1) + " comparisons (O(n))"
+      + "\n         Balanced (median input):   " + str(bal_depth + 1) + " comparisons (O(log n))"
     )
 
   cases = [
@@ -542,14 +474,18 @@ def check_rotations(
     ("Rotate right on interior subtree", test_rotate_interior_subtree),
     ("Double rotation rotate_left_right (LR signature)", test_double_rotation_left_right),
     ("Double rotation rotate_right_left (RL signature)", test_double_rotation_right_left),
-    ("Iterative AVL insertion handles LL, RR, LR, and RL",
-     lambda: test_insert_rotation_cases(avl_insert_iterative)),
-    ("Iterative AVL insertion maintains a larger tree",
-     lambda: test_insert_larger_tree(avl_insert_iterative)),
-    ("Recursive AVL insertion handles LL, RR, LR, and RL",
-     lambda: test_insert_rotation_cases(avl_insert_recursive)),
-    ("Recursive AVL insertion maintains a larger tree",
-     lambda: test_insert_larger_tree(avl_insert_recursive)),
+    ("Iterative AVL insert (LL signature)", make_insert_signature_test(avl_insert_iterative, [30, 20, 10])),
+    ("Iterative AVL insert (RR signature)", make_insert_signature_test(avl_insert_iterative, [10, 20, 30])),
+    ("Iterative AVL insert (LR signature)", make_insert_signature_test(avl_insert_iterative, [30, 10, 20])),
+    ("Iterative AVL insert (RL signature)", make_insert_signature_test(avl_insert_iterative, [10, 30, 20])),
+    ("Iterative AVL insert (sorted and shuffled keys)", make_insert_many_test(avl_insert_iterative)),
+    ("Iterative AVL insert (duplicate key)", make_insert_duplicate_test(avl_insert_iterative)),
+    ("Recursive AVL insert (LL signature)", make_insert_signature_test(avl_insert_recursive, [30, 20, 10])),
+    ("Recursive AVL insert (RR signature)", make_insert_signature_test(avl_insert_recursive, [10, 20, 30])),
+    ("Recursive AVL insert (LR signature)", make_insert_signature_test(avl_insert_recursive, [30, 10, 20])),
+    ("Recursive AVL insert (RL signature)", make_insert_signature_test(avl_insert_recursive, [10, 30, 20])),
+    ("Recursive AVL insert (sorted and shuffled keys)", make_insert_many_test(avl_insert_recursive)),
+    ("Recursive AVL insert (duplicate key)", make_insert_duplicate_test(avl_insert_recursive)),
     ("Imbalance profiling demonstration", demo_degeneration_profiling),
   ]
 
