@@ -3,7 +3,6 @@
 Node structure, search, minimum, and subtree transplant helpers are provided.
 """
 
-
 class Node:
   """Binary Search Tree node with parent pointer and height."""
 
