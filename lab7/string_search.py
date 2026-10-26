@@ -10,10 +10,12 @@ def naive_search(text, pattern):
     if m > n:
         return []
     matches = []
-
-    # TODO 1.2: compare characters at each shift and collect complete matches
-    raise NotImplementedError("Complete naive_search")
-
+    for s in range(n - m + 1):
+        j = 0   
+        while j < m and text[s + j] == pattern[j]:
+            j = j + 1
+        if j == m:
+            matches.append(s)
     return matches
 
 
@@ -31,9 +33,20 @@ def rabin_karp(text, pattern, d=256, q=101):
     p = 0
     t = 0
 
-    # TODO 2.2: build the initial hashes, verify hits, and roll to each next window
-    raise NotImplementedError("Complete rabin_karp")
-
+    for j in range(m):
+        p = (d * p + pattern[j]) % q
+        t = (d * t + text[j]) % q
+    for s in range(n - m + 1):
+        if p == t:
+            match = True
+            for j in range (m):
+                if text[s + j]  != pattern[j]:
+                    match = False
+                    break
+            if match == True:
+                matches.append(s)
+        if s < n - m:
+            t = (d * (t - (text[s]) * h) + (text[s + m])) % q
     return matches
 
 
