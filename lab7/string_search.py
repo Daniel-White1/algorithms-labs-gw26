@@ -34,8 +34,8 @@ def rabin_karp(text, pattern, d=256, q=101):
     t = 0
 
     for j in range(m):
-        p = (d * p + pattern[j]) % q
-        t = (d * t + text[j]) % q
+        p = (d * p + ord(pattern[j])) % q
+        t = (d * t + ord(text[j])) % q
     for s in range(n - m + 1):
         if p == t:
             match = True
@@ -46,7 +46,7 @@ def rabin_karp(text, pattern, d=256, q=101):
             if match == True:
                 matches.append(s)
         if s < n - m:
-            t = (d * (t - (text[s]) * h) + (text[s + m])) % q
+            t = (d * (t - ord(text[s]) * h) + ord(text[s + m])) % q
     return matches
 
 
@@ -59,9 +59,12 @@ def compute_prefix_function(pattern):
     pi = [0] * m
     k = 0
 
-    # TODO 3.2A: extend each border, following prefix links on a mismatch
-    raise NotImplementedError("Complete compute_prefix_function")
-
+    for j in range(1, m):
+        while k > 0 and pattern[k] != pattern[j]:
+            k = pi[k - 1]
+        if pattern[k] == pattern[j]:
+            k = k + 1
+        pi[j] = k
     return pi
 
 
@@ -77,9 +80,14 @@ def kmp_search(text, pattern):
     pi = compute_prefix_function(pattern)
     q = 0
 
-    # TODO 3.2B: scan the text with prefix fallbacks and record all matches
-    raise NotImplementedError("Complete kmp_search")
-
+    for i in range(n):
+        while q > 0 and pattern[q] != text[i]:
+            q = pi[q - 1]
+        if pattern[q] == text[i]:
+            q = q + 1
+        if q == m:
+            matches.append(i - m + 1)
+            q = pi[m - 1]
     return matches
 
 
